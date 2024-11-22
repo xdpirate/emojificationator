@@ -4,6 +4,8 @@ Emojificationates your images.
 
 Turns your image into an emoji string you can put in text fields. Annoy your friends, shitpost to social media, the possibilities are literally endless.
 
+[Click here to get started 😩](https://xdpirate.github.io/emojificationator/)
+
 # What?
 
 ![2024-11-22_22-59](https://github.com/user-attachments/assets/e5c9bef3-9522-4169-9f2f-0d0c5dc7f973)

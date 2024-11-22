@@ -6,9 +6,14 @@ html, body {
     line-height: 150%;
 }
 
-summary {
-    cursor: pointer;
-    user-select: none;
+a {
+    color: #d8dee9;
+    text-decoration: none;
+}
+
+#footer {
+    text-align: center;
+    font-size: x-small;
 }
 
 h1 {

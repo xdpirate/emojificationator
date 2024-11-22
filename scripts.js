@@ -162,7 +162,7 @@ function updateStats() {
     let str = "";
     let isGay = document.getElementById("gayCheckBox").checked;
     let arr = isGay ? defaultGaymojis.slice(0) : defaultEmojis.slice(0);
-    arr.push(isGay ? "🟫" : "🤎"); // This is only used as a replacement for reasons mentioned near the top
+    arr.push(isGay ? "🤎" : "🟫"); // This is only used as a replacement for reasons mentioned near the top
 
     let runningTotal = 0;
     for(let i = 0; i < arr.length; i++) {
