@@ -1,0 +1,105 @@
+html, body {
+    background-color: #2e3440;
+    color: #d8dee9;
+    box-sizing: inherit;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 150%;
+}
+
+summary {
+    cursor: pointer;
+    user-select: none;
+}
+
+h1 {
+    margin: 0;
+}
+
+#tagline {
+    width: 100%;
+    text-align: center;
+    font-size: smaller;
+    margin-bottom: 1em;
+}
+
+.blackBox {
+    text-shadow: 1px 1px 0 #fff, -1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff;
+}
+
+td {
+    text-align: center;
+}
+
+#pageWrapper {
+    width: 99%;
+    height: 99%;
+    text-align: center;
+    vertical-align: top;
+}
+
+#canvasContainer, #emojiContainer {
+    padding: 1em;
+    background: #4c566a;
+    border: 1px dotted #464646;
+    border-radius: 1em;
+    width: max-content;
+    height: max-content;
+}
+
+#emojiContainer {
+    font-size: xx-small;
+    line-height: normal;
+    font-family: Segoe UI Emoji;
+}
+
+.areaContainer {
+    margin-top: 1em;
+    font-size: smaller;
+}
+
+#emojiAreaContainer, #optionsAreaContainer {
+    padding: 10px;
+    display: inline-block;
+    text-align: initial;
+    vertical-align: top;
+}
+
+#optionsAreaContainer, .areaWrapper {
+    border: 1px solid #4c566a;
+    border-radius: 1em;
+    
+}
+
+.areaWrapper td, .areaWrapper{
+    padding: 2px;
+}
+
+.areaWrapper {
+    padding: 0.5em;
+}
+
+#emojiAreaContainer {
+    width: min-content;
+    height: min-content;
+}
+
+.groupHeader {
+    margin-left: 1em;
+    font-size: small;
+    position: relative;
+    top: 0.8em;
+    background-color: #2e3440;
+    width: fit-content;
+}
+
+label {
+    user-select: none;
+}
+
+.resetButton {
+    float: right;
+}
+
+.hidden {
+    display: none;
+}

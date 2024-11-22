@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Emojificationator</title>
+    <link rel="stylesheet" href="./styles.css">
+    <meta charset="utf-8">
+</head>
+
+<body>
+    <div id="pageWrapper">
+        <h1>Emojificationator 🟥🟩🟦</h1>
+        <div id="tagline">Turns your image into an emoji string you can put in text fields</div>
+        <div id="optionsAreaContainer">
+            <canvas id="originalCanvas" style="display: none;"></canvas>
+            <div id="uploadAreaContainer">
+                <input type="button" value="Reset image" onclick="resetImage();" class="resetButton">
+                <label for="imageLoader">Load an image: </label><input type="file" id="imageLoader" name="imageLoader"/><br />
+                
+                Max output size:
+                <input type="radio" id="size1" name="outputSize" value="64" onchange="emojificate()" checked><label for="size1">64x64</label>
+                <input type="radio" id="size2" name="outputSize" value="32" onchange="emojificate()"><label for="size2">32x32</label>
+                <input type="radio" id="size3" name="outputSize" value="16" onchange="emojificate()"><label for="size3">16x16</label><br />
+
+                Transparency key: 
+                <select name="transparencyKey" id="transparencyKey" onchange="emojificate()">
+                    <option value="0">🟥</option>
+                    <option value="1">🟧</option>
+                    <option value="2">🟨</option>
+                    <option value="3">🟩</option>
+                    <option value="4">🟦</option>
+                    <option value="5">🟪</option>
+                    <option value="6" selected>⬜</option>
+                    <option value="7">⬛</option>
+                </select><br />
+                <input type="checkbox" name="cropTransparencyCheckBox" id="cropTransparencyCheckBox" checked><label for="cropTransparencyCheckBox">Crop transparency</label>
+                
+                <br />
+            </div>
+
+            <div id="canvasAreaContainer" class="hidden">
+                Reference image:<br />
+                <div id="canvasContainer">
+                    <canvas id="resizedCanvas"></canvas>
+                </div>
+            </div>
+
+            <div class="areaContainer">
+                <div class="groupHeader resetButton">
+                    <input type="button" value="Reset adjustments" onclick="resetAdjustments();">
+                </div>
+                <div class="groupHeader">
+                    Image adjustments 
+                </div>
+                <div class="areaWrapper">
+                    <table>
+                        <tr>
+                            <td>
+                                <label for="brightnessSlider" id="brightnessSliderLabel">Brightness (100%)</label><br />
+                                <input type="range" min="1" max="200" value="100" id="brightnessSlider" name="brightnessSlider" oninput="updateSliderLabel('brightness');">
+                            </td>
+                            <td>
+                                <label for="contrastSlider" id="contrastSliderLabel">Contrast (100%)</label><br />
+                                <input type="range" min="0" max="200" value="100" id="contrastSlider" name="contrastSlider" oninput="updateSliderLabel('contrast');">
+                            </td>
+                            <td>
+                                <label for="grayscaleSlider" id="grayscaleSliderLabel">Grayscale (0%)</label><br />
+                                <input type="range" min="0" max="100" value="0" id="grayscaleSlider" name="grayscaleSlider" oninput="updateSliderLabel('grayscale');">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="hueSlider" id="hueSliderLabel">Hue rotation (0°)</label><br />
+                                <input type="range" min="0" max="360" value="0" id="hueSlider" name="hueSlider" oninput="updateSliderLabel('hue');">
+                            </td>
+                            <td>
+                                <label for="saturationSlider" id="saturationSliderLabel">Saturation (100%)</label><br />
+                                <input type="range" min="0" max="200" value="100" id="saturationSlider" name="saturationSlider" oninput="updateSliderLabel('saturation');">
+                            </td>
+                            <td>
+                                <label for="sepiaSlider" id="sepiaSliderLabel">Sepia (0%)</label><br />
+                                <input type="range" min="0" max="100" value="0" id="sepiaSlider" name="sepiaSlider" oninput="updateSliderLabel('sepia');">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="invertSlider" id="invertSliderLabel">Invert colors (0%)</label><br />
+                                <input type="range" min="0" max="100" value="0" id="invertSlider" name="invertSlider" oninput="updateSliderLabel('invert');">
+                            </td>
+                            <td>
+                                <input type="checkbox" id="monochromeCheckBox" onchange="emojificate()"><label for="monochromeCheckBox">Monochrome (1-bit)</label><br />
+                                <input type="checkbox" id="monochromeInvertCheckBox" onchange="emojificate()"><label for="monochromeInvertCheckBox">Invert monochrome</label>
+                            </td>
+                            <td>
+                                <label for="monochromeThresholdSlider" id="monochromeThresholdSliderLabel">1-bit threshold (128)</label><br />
+                                <input type="range" min="1" max="256" value="128" id="monochromeThresholdSlider" name="monochromeThresholdSlider" oninput="updateSliderLabel('monochromeThreshold');">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <input type="checkbox" id="gayCheckBox" onchange="emojificate()"><label for="gayCheckBox">Make it gay 💃🏻</label>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <div class="areaContainer">
+                <div class="groupHeader resetButton">
+                    <input type="button" value="Reset extras" onclick="updateCustomColors(true);">
+                </div>
+                <div class="groupHeader">
+                    Extra options
+                </div>
+                <div class="areaWrapper">
+                    Palette swap:<br />
+
+                    <table>
+                        <tr>
+                            <td>
+                                🟥 ↓
+                            </td>
+                            <td>
+                                🟧 ↓
+                            </td>
+                            <td>
+                                🟨 ↓
+                            </td>
+                            <td>
+                                🟩 ↓
+                            </td>
+                            <td>
+                                🟦 ↓
+                            </td>
+                            <td>
+                                🟪 ↓
+                            </td>
+                            <td>
+                                ⬜ ↓
+                            </td>
+                            <td>
+                                <span class="blackBox">⬛</span> ↓
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <select name="repaint0" id="repaint0" onchange="updateCustomColors();">
+                                    <option value="🟥" data-gaymoji="💖" selected>🟥</option>
+                                    <option value="🟧" data-gaymoji="🧡">🟧</option>
+                                    <option value="🟨" data-gaymoji="💛">🟨</option>
+                                    <option value="🟩" data-gaymoji="🥒">🟩</option>
+                                    <option value="🟦" data-gaymoji="💙">🟦</option>
+                                    <option value="🟪" data-gaymoji="🍆">🟪</option>
+                                    <option value="🟫" data-gaymoji="🤎">🟫</option>
+                                    <option value="⬜" data-gaymoji="🤍">⬜</option>
+                                    <option value="⬛" data-gaymoji="🖤">⬛</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="repaint1" id="repaint1" onchange="updateCustomColors();">
+                                    <option value="🟥" data-gaymoji="💖">🟥</option>
+                                    <option value="🟧" data-gaymoji="🧡" selected>🟧</option>
+                                    <option value="🟨" data-gaymoji="💛">🟨</option>
+                                    <option value="🟩" data-gaymoji="🥒">🟩</option>
+                                    <option value="🟦" data-gaymoji="💙">🟦</option>
+                                    <option value="🟪" data-gaymoji="🍆">🟪</option>
+                                    <option value="🟫" data-gaymoji="🤎">🟫</option>
+                                    <option value="⬜" data-gaymoji="🤍">⬜</option>
+                                    <option value="⬛" data-gaymoji="🖤">⬛</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="repaint2" id="repaint2" onchange="updateCustomColors();">
+                                    <option value="🟥" data-gaymoji="💖">🟥</option>
+                                    <option value="🟧" data-gaymoji="🧡">🟧</option>
+                                    <option value="🟨" data-gaymoji="💛" selected>🟨</option>
+                                    <option value="🟩" data-gaymoji="🥒">🟩</option>
+                                    <option value="🟦" data-gaymoji="💙">🟦</option>
+                                    <option value="🟪" data-gaymoji="🍆">🟪</option>
+                                    <option value="🟫" data-gaymoji="🤎">🟫</option>
+                                    <option value="⬜" data-gaymoji="🤍">⬜</option>
+                                    <option value="⬛" data-gaymoji="🖤">⬛</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="repaint3" id="repaint3" onchange="updateCustomColors();">
+                                    <option value="🟥" data-gaymoji="💖">🟥</option>
+                                    <option value="🟧" data-gaymoji="🧡">🟧</option>
+                                    <option value="🟨" data-gaymoji="💛">🟨</option>
+                                    <option value="🟩" data-gaymoji="🥒" selected>🟩</option>
+                                    <option value="🟦" data-gaymoji="💙">🟦</option>
+                                    <option value="🟪" data-gaymoji="🍆">🟪</option>
+                                    <option value="🟫" data-gaymoji="🤎">🟫</option>
+                                    <option value="⬜" data-gaymoji="🤍">⬜</option>
+                                    <option value="⬛" data-gaymoji="🖤">⬛</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="repaint4" id="repaint4" onchange="updateCustomColors();">
+                                    <option value="🟥" data-gaymoji="💖">🟥</option>
+                                    <option value="🟧" data-gaymoji="🧡">🟧</option>
+                                    <option value="🟨" data-gaymoji="💛">🟨</option>
+                                    <option value="🟩" data-gaymoji="🥒">🟩</option>
+                                    <option value="🟦" data-gaymoji="💙" selected>🟦</option>
+                                    <option value="🟪" data-gaymoji="🍆">🟪</option>
+                                    <option value="🟫" data-gaymoji="🤎">🟫</option>
+                                    <option value="⬜" data-gaymoji="🤍">⬜</option>
+                                    <option value="⬛" data-gaymoji="🖤">⬛</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="repaint4" id="repaint4" onchange="updateCustomColors();">
+                                    <option value="🟥" data-gaymoji="💖">🟥</option>
+                                    <option value="🟧" data-gaymoji="🧡">🟧</option>
+                                    <option value="🟨" data-gaymoji="💛">🟨</option>
+                                    <option value="🟩" data-gaymoji="🥒">🟩</option>
+                                    <option value="🟦" data-gaymoji="💙">🟦</option>
+                                    <option value="🟪" data-gaymoji="🍆" selected>🟪</option>
+                                    <option value="🟫" data-gaymoji="🤎">🟫</option>
+                                    <option value="⬜" data-gaymoji="🤍">⬜</option>
+                                    <option value="⬛" data-gaymoji="🖤">⬛</option>
+                                </select>
+                            </td>
+                            <td><select name="repaint5" id="repaint5" onchange="updateCustomColors();">
+                                    <option value="🟥" data-gaymoji="💖">🟥</option>
+                                    <option value="🟧" data-gaymoji="🧡">🟧</option>
+                                    <option value="🟨" data-gaymoji="💛">🟨</option>
+                                    <option value="🟩" data-gaymoji="🥒">🟩</option>
+                                    <option value="🟦" data-gaymoji="💙">🟦</option>
+                                    <option value="🟪" data-gaymoji="🍆">🟪</option>
+                                    <option value="🟫" data-gaymoji="🤎">🟫</option>
+                                    <option value="⬜" data-gaymoji="🤍" selected>⬜</option>
+                                    <option value="⬛" data-gaymoji="🖤">⬛</option>
+                                </select>  
+                                
+                            </td>
+                            <td>
+                                <select name="repaint6" id="repaint6" onchange="updateCustomColors();">
+                                    <option value="🟥" data-gaymoji="💖">🟥</option>
+                                    <option value="🟧" data-gaymoji="🧡">🟧</option>
+                                    <option value="🟨" data-gaymoji="💛">🟨</option>
+                                    <option value="🟩" data-gaymoji="🥒">🟩</option>
+                                    <option value="🟦" data-gaymoji="💙">🟦</option>
+                                    <option value="🟪" data-gaymoji="🍆">🟪</option>
+                                    <option value="🟫" data-gaymoji="🤎">🟫</option>
+                                    <option value="⬜" data-gaymoji="🤍">⬜</option>
+                                    <option value="⬛" data-gaymoji="🖤" selected>⬛</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- <input type="button" value="Launch the nukes 🚀" onclick="this.value='💥💥💥💥💥'"> -->
+                </div>
+            </div>
+
+            <div class="areaContainer">
+                <div class="groupHeader">
+                    Statistics
+                </div>
+                <div class="areaWrapper">
+                    <div id="statsArea"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="emojiAreaContainer">
+            <div id="emojiContainer" class="hidden"></div>
+        </div>
+    </div>
+    <script src="./scripts.js"></script>
+</body>
+
+</html>
