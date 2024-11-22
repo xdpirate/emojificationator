@@ -160,7 +160,10 @@ function emojificate() {
 
 function updateStats() {
     let str = "";
-    let arr = document.getElementById("gayCheckBox").checked ? defaultGaymojis : defaultEmojis;
+    let isGay = document.getElementById("gayCheckBox").checked;
+    let arr = isGay ? defaultGaymojis.slice(0) : defaultEmojis.slice(0);
+    arr.push(isGay ? "🟫" : "🤎"); // This is only used as a replacement for reasons mentioned near the top
+
     let runningTotal = 0;
     for(let i = 0; i < arr.length; i++) {
         let count = (document.getElementById("emojiContainer").innerText.match(new RegExp(arr[i], "g")) || []).length;
