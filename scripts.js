@@ -19,6 +19,25 @@ let currentGaymojis = ["💖", "🧡", "💛", "🥒", "💙", "🍆", "🤍", "
 // be worked around to get a more natural mapping.
 //     [142, 86, 46],   //🟫
 
+async function copyOutput() {
+    let tempInput = document.createElement("textarea");
+    tempInput.value = document.getElementById("emojiContainer").innerHTML.replaceAll("<br>", "\n");
+    tempInput.select();
+    tempInput.setSelectionRange(0,999999);
+    
+    try {
+        await navigator.clipboard.writeText(tempInput.value);
+        
+        document.getElementById("copyButton").value = "Copied! ✓";
+
+        window.setTimeout(() => {
+            document.getElementById("copyButton").value = "Copy";
+        }, 3000);
+    } catch (err) {
+        alert("Failed to copy to clipboard:\n" + err);
+    }
+}
+
 let referenceColors = [
     [255, 0, 0],     //🟥
     [247, 99, 12],   //🟧
@@ -126,14 +145,14 @@ function emojificate() {
             }
 
             if(currentPixel > 0 && i % 4 == 0 && (currentPixel + 1) % resizedCanvas.width == 0) {
-                emojiStr += "<br />";
+                emojiStr += "<br>";
             }
         }
 
         document.getElementById("emojiContainer").innerHTML = emojiStr;
 
         document.getElementById("canvasAreaContainer").classList.remove("hidden");
-        document.getElementById("emojiContainer").classList.remove("hidden");
+        document.getElementById("emojiAreaContainer").classList.remove("hidden");
 
         updateStats();
     }
