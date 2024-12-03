@@ -100,7 +100,6 @@ function emojificate() {
         let imgData = resizedContext.getImageData(0, 0, resizedCanvas.width, resizedCanvas.height);
 
         // Draw the emojis
-        let w = 0, h = 0;
         for(let i = 0; i < imgData.data.length; i += 4) {
             let r = imgData.data[i], g = imgData.data[i+1], b = imgData.data[i+2], a = imgData.data[i+3];
             
@@ -146,11 +145,6 @@ function emojificate() {
             }
 
             if(currentPixel > 0 && i % 4 == 0 && (currentPixel + 1) % resizedCanvas.width == 0) {
-                if(w == 0) {
-                    w = currentPixel + 1; // only set the first time
-                }
-                h++;
-
                 emojiStr += "<br>";
             }
         }
@@ -160,11 +154,11 @@ function emojificate() {
         document.getElementById("canvasAreaContainer").classList.remove("hidden");
         document.getElementById("emojiAreaContainer").classList.remove("hidden");
 
-        updateStats(w, h);
+        updateStats();
     }
 }
 
-function updateStats(w, h) {
+function updateStats() {
     let str = "";
     let isGay = document.getElementById("gayCheckBox").checked;
     let arr = isGay ? defaultGaymojis.slice(0) : defaultEmojis.slice(0);
@@ -184,7 +178,7 @@ function updateStats(w, h) {
     }
     
     document.getElementById("colorDistributionArea").innerHTML = "Color distribution: " + str;
-    document.getElementById("imageStatsArea").innerHTML = "Dimensions: " + w + "x" + h;
+    document.getElementById("imageStatsArea").innerHTML = "Dimensions: " + resizedCanvas.width + "x" + resizedCanvas.height;
 }
 
 function updateSliderLabel(which) {
