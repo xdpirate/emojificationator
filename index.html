@@ -119,30 +119,14 @@
 
                     <table>
                         <tr>
-                            <td>
-                                🟥 ↓
-                            </td>
-                            <td>
-                                🟧 ↓
-                            </td>
-                            <td>
-                                🟨 ↓
-                            </td>
-                            <td>
-                                🟩 ↓
-                            </td>
-                            <td>
-                                🟦 ↓
-                            </td>
-                            <td>
-                                🟪 ↓
-                            </td>
-                            <td>
-                                ⬜ ↓
-                            </td>
-                            <td>
-                                <span class="blackBox">⬛</span> ↓
-                            </td>
+                            <td>🟥 ↓</td>
+                            <td>🟧 ↓</td>
+                            <td>🟨 ↓</td>
+                            <td>🟩 ↓</td>
+                            <td>🟦 ↓</td>
+                            <td>🟪 ↓</td>
+                            <td>⬜ ↓</td>
+                            <td><span class="blackBox">⬛</span> ↓</td>
                         </tr>
                         <tr>
                             <td>
@@ -211,7 +195,7 @@
                                 </select>
                             </td>
                             <td>
-                                <select name="repaint4" id="repaint4" onchange="updateCustomColors();">
+                                <select name="repaint5" id="repaint5" onchange="updateCustomColors();">
                                     <option value="🟥" data-gaymoji="💖">🟥</option>
                                     <option value="🟧" data-gaymoji="🧡">🟧</option>
                                     <option value="🟨" data-gaymoji="💛">🟨</option>
@@ -223,7 +207,7 @@
                                     <option value="⬛" data-gaymoji="🖤">⬛</option>
                                 </select>
                             </td>
-                            <td><select name="repaint5" id="repaint5" onchange="updateCustomColors();">
+                            <td><select name="repaint6" id="repaint6" onchange="updateCustomColors();">
                                     <option value="🟥" data-gaymoji="💖">🟥</option>
                                     <option value="🟧" data-gaymoji="🧡">🟧</option>
                                     <option value="🟨" data-gaymoji="💛">🟨</option>
@@ -237,7 +221,7 @@
                                 
                             </td>
                             <td>
-                                <select name="repaint6" id="repaint6" onchange="updateCustomColors();">
+                                <select name="repaint7" id="repaint7" onchange="updateCustomColors();">
                                     <option value="🟥" data-gaymoji="💖">🟥</option>
                                     <option value="🟧" data-gaymoji="🧡">🟧</option>
                                     <option value="🟨" data-gaymoji="💛">🟨</option>
@@ -261,7 +245,10 @@
                     Statistics
                 </div>
                 <div class="areaWrapper">
-                    <div id="statsArea"></div>
+                    <div id="statsArea">
+                        <div id="colorDistributionArea"></div>
+                        <div id="imageStatsArea"></div>
+                    </div>
                 </div>
             </div>
         </div>

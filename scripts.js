@@ -100,6 +100,7 @@ function emojificate() {
         let imgData = resizedContext.getImageData(0, 0, resizedCanvas.width, resizedCanvas.height);
 
         // Draw the emojis
+        let w = 0, h = 0;
         for(let i = 0; i < imgData.data.length; i += 4) {
             let r = imgData.data[i], g = imgData.data[i+1], b = imgData.data[i+2], a = imgData.data[i+3];
             
@@ -145,6 +146,11 @@ function emojificate() {
             }
 
             if(currentPixel > 0 && i % 4 == 0 && (currentPixel + 1) % resizedCanvas.width == 0) {
+                if(w == 0) {
+                    w = currentPixel + 1; // only set the first time
+                }
+                h++;
+
                 emojiStr += "<br>";
             }
         }
@@ -154,19 +160,20 @@ function emojificate() {
         document.getElementById("canvasAreaContainer").classList.remove("hidden");
         document.getElementById("emojiAreaContainer").classList.remove("hidden");
 
-        updateStats();
+        updateStats(w, h);
     }
 }
 
-function updateStats() {
+function updateStats(w, h) {
     let str = "";
     let isGay = document.getElementById("gayCheckBox").checked;
     let arr = isGay ? defaultGaymojis.slice(0) : defaultEmojis.slice(0);
+    let currImg = document.getElementById("emojiContainer").innerHTML.trim();
     arr.push(isGay ? "🤎" : "🟫"); // This is only used as a replacement for reasons mentioned near the top
 
     let runningTotal = 0;
     for(let i = 0; i < arr.length; i++) {
-        let count = (document.getElementById("emojiContainer").innerText.match(new RegExp(arr[i], "g")) || []).length;
+        let count = (currImg.match(new RegExp(arr[i], "g")) || []).length;
         runningTotal += count;
         
         let outputMoji = arr[i];
@@ -175,7 +182,9 @@ function updateStats() {
         }
         str += outputMoji + " " + count + " ";
     }
-    document.getElementById("statsArea").innerHTML = str;
+    
+    document.getElementById("colorDistributionArea").innerHTML = "Color distribution: " + str;
+    document.getElementById("imageStatsArea").innerHTML = "Dimensions: " + w + "x" + h;
 }
 
 function updateSliderLabel(which) {
@@ -204,12 +213,8 @@ function updateCustomColors(reset) {
     }
     
     let elements = document.querySelectorAll("select[id^='repaint']");
-    console.log("elements: " + elements);
     for(let i = 0; i < elements.length; i++) {
-        console.log("i = " + i);
         if(reset) {
-            console.log("reset = " + reset);
-            console.log("setting elements[i].value (" + elements[i].value + ") to " + "defaultEmojis[i] (" + defaultEmojis[i] + ")");
             elements[i].value = defaultEmojis[i];
         } else {
             currentEmojis[i] = elements[i].value;
