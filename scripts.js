@@ -1,9 +1,13 @@
+let pica = window.pica();
+
 let imageLoader = document.getElementById("imageLoader");
 imageLoader.addEventListener("change", writeInitialImage, false);
 let originalCanvas = document.getElementById("originalCanvas");
 let originalContext = originalCanvas.getContext("2d");
 let resizedCanvas = document.getElementById("resizedCanvas");
 let resizedContext = resizedCanvas.getContext("2d");
+let croppedCanvas = document.getElementById("croppedCanvas");
+let croppedContext = croppedCanvas.getContext("2d");
 let imageUploaded = false;
 
 let emojiCount = [0,0,0,0,0,0,0,0];
@@ -58,11 +62,35 @@ function writeInitialImage(referer){
             originalCanvas.height = img.height;
             originalContext.drawImage(img, 0, 0);
             imageUploaded = true;
+            setInitialCropValues();
             emojificate();
         };
         img.src = event.target.result;
     };
     reader.readAsDataURL(referer.target.files[0]);
+}
+
+function setInitialCropValues() {
+    let size = Number(document.querySelector('input[name="outputSize"]:checked').value);
+    let w, h;
+    if(originalCanvas.width > size || originalCanvas.height > size) {
+        let ratio = Math.min(size / originalCanvas.width, size / originalCanvas.height);
+        w = Math.ceil(originalCanvas.width * ratio);
+        h = Math.ceil(originalCanvas.height * ratio);
+    } else {
+        w = originalCanvas.width;
+        h = originalCanvas.height;
+    }
+
+    document.getElementById("cropTop").value = 0;
+    document.getElementById("cropBottom").value = 0;
+    document.getElementById("cropLeft").value = 0;
+    document.getElementById("cropRight").value = 0;
+
+    document.getElementById("cropTop").max = h - 1;
+    document.getElementById("cropBottom").max = h - 1;
+    document.getElementById("cropLeft").max = w - 1;
+    document.getElementById("cropRight").max = w - 1;
 }
 
 function emojificate() {
@@ -83,79 +111,108 @@ function emojificate() {
             resizedCanvas.height = originalCanvas.height;
         }
 
-        // Apply any adjustments before drawing
-        let brightness = Number(document.getElementById("brightnessSlider").value);
-        let contrast = Number(document.getElementById("contrastSlider").value);
-        let grayscale = Number(document.getElementById("grayscaleSlider").value);
-        let hue = Number(document.getElementById("hueSlider").value);
-        let saturation = Number(document.getElementById("saturationSlider").value);
-        let sepia = Number(document.getElementById("sepiaSlider").value);
-        let invert = Number(document.getElementById("invertSlider").value);
+        // Update max crop values
+        document.getElementById("cropTop").max = resizedCanvas.height - document.getElementById("cropBottom").value - 1;
+        document.getElementById("cropBottom").max = resizedCanvas.height - document.getElementById("cropTop").value - 1;
         
-        resizedContext.filter = "brightness(" + brightness + "%) contrast(" + contrast + "%) grayscale(" + grayscale + "%) hue-rotate(" + hue + "deg) saturate(" + saturation + "%) sepia(" + sepia + "%) invert(" + invert + "%)";
-        resizedContext.drawImage(originalCanvas, 0, 0, resizedCanvas.width, resizedCanvas.height);
+        document.getElementById("cropLeft").max = resizedCanvas.width - document.getElementById("cropRight").value - 2;
+        document.getElementById("cropRight").max = resizedCanvas.width - document.getElementById("cropLeft").value - 2;
         
-        // Iterate through each pixel
-        let emojiStr = "";
-        let imgData = resizedContext.getImageData(0, 0, resizedCanvas.width, resizedCanvas.height);
+        if(document.getElementById("hqDownsampleCheckBox").checked) {
+            // HQ downsample with pica
+            pica.resize(originalCanvas, resizedCanvas).then(result => finalizeDrawing());
+        } else {
+            // Draw with vanilla browser downsampling
+            resizedContext.drawImage(originalCanvas, 0, 0, resizedCanvas.width, resizedCanvas.height);
+            finalizeDrawing();
+        }
+    }
+}
 
-        // Draw the emojis
-        for(let i = 0; i < imgData.data.length; i += 4) {
-            let r = imgData.data[i], g = imgData.data[i+1], b = imgData.data[i+2], a = imgData.data[i+3];
+function finalizeDrawing() {
+    // Calculate crop values
+    let cx, cy, cw, ch;
+    cx = Number(document.getElementById("cropLeft").value);
+    cw = resizedCanvas.width - cx - Number(document.getElementById("cropRight").value);
+    
+    cy = Number(document.getElementById("cropTop").value);
+    ch = resizedCanvas.height - cy - Number(document.getElementById("cropBottom").value);
+
+    croppedCanvas.width = cw;
+    croppedCanvas.height = ch;
+
+    // Draw final image with filters
+    let brightness = Number(document.getElementById("brightnessSlider").value);
+    let contrast = Number(document.getElementById("contrastSlider").value);
+    let grayscale = Number(document.getElementById("grayscaleSlider").value);
+    let hue = Number(document.getElementById("hueSlider").value);
+    let saturation = Number(document.getElementById("saturationSlider").value);
+    let sepia = Number(document.getElementById("sepiaSlider").value);
+    let invert = Number(document.getElementById("invertSlider").value);
+
+    croppedContext.filter = "brightness(" + brightness + "%) contrast(" + contrast + "%) grayscale(" + grayscale + "%) hue-rotate(" + hue + "deg) saturate(" + saturation + "%) sepia(" + sepia + "%) invert(" + invert + "%)";
+    croppedContext.drawImage(resizedCanvas, cx, cy, cw, ch, 0, 0, cw, ch);
+
+    // Iterate through each pixel
+    let emojiStr = "";
+    let imgData = croppedContext.getImageData(0, 0, croppedCanvas.width, croppedCanvas.height);
+
+    // Draw the emojis
+    for(let i = 0; i < imgData.data.length; i += 4) {
+        let r = imgData.data[i], g = imgData.data[i+1], b = imgData.data[i+2], a = imgData.data[i+3];
+        
+        // If 1-bit, check if any pixel has any rgb value less than the threshold to determine whether its emoji should be black or white
+        if(document.getElementById("monochromeCheckBox").checked) {
+            let threshold = Number(document.getElementById("monochromeThresholdSlider").value);
+            let monochromeInvert = document.getElementById("monochromeInvertCheckBox").checked;
             
-            // If 1-bit, check if any pixel has any rgb value less than the threshold to determine whether its emoji should be black or white
-            if(document.getElementById("monochromeCheckBox").checked) {
-                let threshold = Number(document.getElementById("monochromeThresholdSlider").value);
-                let monochromeInvert = document.getElementById("monochromeInvertCheckBox").checked;
-                
-                if(r < threshold || g < threshold || b < threshold) {
-                    let val = monochromeInvert ? 255 : 0;
-                    r = val; g = val; b = val;
-                } else {
-                    let val = monochromeInvert ? 0 : 255;
-                    r = val; g = val; b = val;
-                }
-                a = 255; // Ignore alpha in 1-bit mode
-            }
-
-            let emojiIndex = 0;
-            if(a < 170) {
-                emojiIndex = Number(document.getElementById("transparencyKey").value); // If alpha channel is less than 170, set to transparency key. This number is arbitrarily set
+            if(r < threshold || g < threshold || b < threshold) {
+                let val = monochromeInvert ? 255 : 0;
+                r = val; g = val; b = val;
             } else {
-                // Calculate the difference between our reference colors and the current pixel's colors
-                let colorDifferences = [];
-                for(let currentColor = 0; currentColor < referenceColors.length; currentColor++) {
-                    colorDifferences.push(Math.sqrt((r - referenceColors[currentColor][0])**2 + (g - referenceColors[currentColor][1])**2 + (b - referenceColors[currentColor][2])**2));
-                }
-
-                emojiIndex = colorDifferences.indexOf(Math.min(...colorDifferences));
+                let val = monochromeInvert ? 0 : 255;
+                r = val; g = val; b = val;
             }
-            
-            emojiCount[emojiIndex]++;
-            if(document.getElementById("gayCheckBox").checked) {
-                emojiStr += currentGaymojis[emojiIndex];
-            } else {
-                emojiStr += currentEmojis[emojiIndex];
-            }
-
-            // Line break when new image row starts
-            let currentPixel = 0;
-            if(i > 0 && i % 4 == 0) {
-                currentPixel = i / 4;
-            }
-
-            if(currentPixel > 0 && i % 4 == 0 && (currentPixel + 1) % resizedCanvas.width == 0) {
-                emojiStr += "<br>";
-            }
+            a = 255; // Ignore alpha in 1-bit mode
         }
 
-        document.getElementById("emojiContainer").innerHTML = emojiStr;
+        let emojiIndex = 0;
+        if(a < 170) {
+            emojiIndex = Number(document.getElementById("transparencyKey").value); // If alpha channel is less than 170, set to transparency key. This number is arbitrarily set
+        } else {
+            // Calculate the difference between our reference colors and the current pixel's colors
+            let colorDifferences = [];
+            for(let currentColor = 0; currentColor < referenceColors.length; currentColor++) {
+                colorDifferences.push(Math.sqrt((r - referenceColors[currentColor][0])**2 + (g - referenceColors[currentColor][1])**2 + (b - referenceColors[currentColor][2])**2));
+            }
 
-        document.getElementById("canvasAreaContainer").classList.remove("hidden");
-        document.getElementById("emojiAreaContainer").classList.remove("hidden");
+            emojiIndex = colorDifferences.indexOf(Math.min(...colorDifferences));
+        }
+        
+        emojiCount[emojiIndex]++;
+        if(document.getElementById("gayCheckBox").checked) {
+            emojiStr += currentGaymojis[emojiIndex];
+        } else {
+            emojiStr += currentEmojis[emojiIndex];
+        }
 
-        updateStats();
+        // Line break when new image row starts
+        let currentPixel = 0;
+        if(i > 0 && i % 4 == 0) {
+            currentPixel = i / 4;
+        }
+
+        if(currentPixel > 0 && i % 4 == 0 && (currentPixel + 1) % croppedCanvas.width == 0) {
+            emojiStr += "<br>";
+        }
     }
+
+    document.getElementById("emojiContainer").innerHTML = emojiStr;
+
+    document.getElementById("canvasAreaContainer").classList.remove("hidden");
+    document.getElementById("emojiAreaContainer").classList.remove("hidden");
+
+    updateStats();
 }
 
 function updateStats() {
@@ -178,7 +235,7 @@ function updateStats() {
     }
     
     document.getElementById("colorDistributionArea").innerHTML = "Color distribution: " + str;
-    document.getElementById("imageStatsArea").innerHTML = "Dimensions: " + resizedCanvas.width + "x" + resizedCanvas.height;
+    document.getElementById("imageStatsArea").innerHTML = "Dimensions: " + croppedCanvas.width + "x" + croppedCanvas.height;
 }
 
 function updateSliderLabel(which) {
@@ -244,5 +301,6 @@ function resetImage() {
     document.getElementById("imageLoader").value = null;
     document.getElementById("size1").checked = true;
     document.getElementById("transparencyKey").selectedIndex = 6;
+    document.getElementById("hqDownsampleCheckBox").checked = true;
     location.reload();
 }

@@ -18,6 +18,10 @@ Boredom.
 
 Issues and PRs will be regarded with extreme scrutiny.
 
+# Privacy
+
+Loaded images are never sent anywhere, and no data leaves your browser. All processing happens on the client. You can verify this by reading the source code.
+
 # License
 
     Emojificationator - Turns your images into grids of emojis

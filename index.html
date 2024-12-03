@@ -6,6 +6,7 @@
     <title>Emojificationator</title>
     <link rel="stylesheet" href="./styles.css">
     <meta charset="utf-8">
+    <script src="./pica.min.js"></script>
 </head>
 
 <body>
@@ -14,14 +15,15 @@
         <div id="tagline">Turns your image into an emoji string you can put in text fields</div>
         <div id="optionsAreaContainer">
             <canvas id="originalCanvas" style="display: none;"></canvas>
+            <canvas id="resizedCanvas" style="display: none;"></canvas>
             <div id="uploadAreaContainer">
                 <input type="button" value="Reset image" onclick="resetImage();" class="resetButton">
                 <label for="imageLoader">Load an image: </label><input type="file" id="imageLoader" name="imageLoader"/><br />
                 
                 Max output size:
-                <input type="radio" id="size1" name="outputSize" value="64" onchange="emojificate()" checked><label for="size1">64x64</label>
-                <input type="radio" id="size2" name="outputSize" value="32" onchange="emojificate()"><label for="size2">32x32</label>
-                <input type="radio" id="size3" name="outputSize" value="16" onchange="emojificate()"><label for="size3">16x16</label><br />
+                <input type="radio" id="size1" name="outputSize" value="64" onchange="setInitialCropValues();emojificate()" checked><label for="size1">64x64</label>
+                <input type="radio" id="size2" name="outputSize" value="32" onchange="setInitialCropValues();emojificate()"><label for="size2">32x32</label>
+                <input type="radio" id="size3" name="outputSize" value="16" onchange="setInitialCropValues();emojificate()"><label for="size3">16x16</label><br />
 
                 Transparency key: 
                 <select name="transparencyKey" id="transparencyKey" onchange="emojificate()">
@@ -34,15 +36,16 @@
                     <option value="6" selected>⬜</option>
                     <option value="7">⬛</option>
                 </select><br />
-                <!--<input type="checkbox" name="cropTransparencyCheckBox" id="cropTransparencyCheckBox" checked><label for="cropTransparencyCheckBox">Crop transparency</label> NOT IMPLEMENTED YET-->
+
+                <input type="checkbox" id="hqDownsampleCheckBox" name="hqDownsampleCheckBox" onchange="emojificate();" checked><label for="hqDownsampleCheckBox">High quality downsampling</label>
                 
-                <br />
+                <br /><br />
             </div>
 
             <div id="canvasAreaContainer" class="hidden">
                 Reference image:<br />
                 <div id="canvasContainer">
-                    <canvas id="resizedCanvas"></canvas>
+                    <canvas id="croppedCanvas"></canvas>
                 </div>
             </div>
 
@@ -109,7 +112,7 @@
 
             <div class="areaContainer">
                 <div class="groupHeader resetButton">
-                    <input type="button" value="Reset extras" onclick="updateCustomColors(true);">
+                    <input type="button" value="Reset extras" onclick="setInitialCropValues();updateCustomColors(true);">
                 </div>
                 <div class="groupHeader">
                     Extra options
@@ -236,6 +239,14 @@
                         </tr>
                     </table>
                     
+                    <br />
+
+                    Crop <i>n</i> pixels from each side:<br />
+                    Top: <input type="number" id="cropTop" name="cropTop" min="0" max="64" value="0" oninput="emojificate();">
+                    Left: <input type="number" id="cropLeft" name="cropLeft" min="0" max="64" value="0" oninput="emojificate();">
+                    Bottom: <input type="number" id="cropBottom" name="cropBottom" min="0" max="64" value="0" oninput="emojificate();">
+                    Right: <input type="number" id="cropRight" name="cropRight" min="0" max="64" value="0" oninput="emojificate();">
+
                     <!-- <input type="button" value="Launch the nukes 🚀" onclick="this.value='💥💥💥💥💥'"> -->
                 </div>
             </div>
