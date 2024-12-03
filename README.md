@@ -8,7 +8,7 @@ Turns your image into an emoji string you can put in text fields. Annoy your fri
 
 # What?
 
-![2024-11-22_22-59](https://github.com/user-attachments/assets/e5c9bef3-9522-4169-9f2f-0d0c5dc7f973)
+![2024-12-03_21-41](https://github.com/user-attachments/assets/8d3d8ebf-524b-4255-bbf9-93d48151c753)
 
 # Why?
 

@@ -129,10 +129,11 @@ function emojificate() {
         document.getElementById("cropLeft").max = resizedCanvas.width - document.getElementById("cropRight").value - 2;
         document.getElementById("cropRight").max = resizedCanvas.width - document.getElementById("cropLeft").value - 2;
         
-        if(document.getElementById("hqDownsampleCheckBox").checked) {
+        // If HQ enabled, and the source image is larger than the desired output size in either dimension
+        if(document.getElementById("hqDownsampleCheckBox").checked && (originalCanvas.width > size || originalCanvas.height > size)) {
             // HQ downsample with pica
             pica.resize(originalCanvas, resizedCanvas).then(result => finalizeDrawing());
-        } else {
+        } else { // If HQ not enabled, or source image is smaller or equal to the desired output size, don't resize
             // Draw with vanilla browser downsampling
             resizedContext.drawImage(originalCanvas, 0, 0, resizedCanvas.width, resizedCanvas.height);
             finalizeDrawing();
