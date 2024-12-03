@@ -42,6 +42,17 @@ async function copyOutput() {
     }
 }
 
+function downloadOutput() {
+    let element = document.createElement('a');
+    element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(document.getElementById("emojiContainer").innerHTML.replaceAll("<br>", "\n")));
+    element.setAttribute("download", `emojificationator-${Date.now()}.txt`);
+    element.style.display = "none";
+    document.body.appendChild(element);
+  
+    element.click();
+    document.body.removeChild(element);
+}
+
 let referenceColors = [
     [255, 0, 0],     //🟥
     [247, 99, 12],   //🟧
