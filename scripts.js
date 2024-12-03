@@ -25,7 +25,13 @@ let currentGaymojis = ["💖", "🧡", "💛", "🥒", "💙", "🍆", "🤍", "
 
 async function copyOutput() {
     let tempInput = document.createElement("textarea");
+
     tempInput.value = document.getElementById("emojiContainer").innerHTML.replaceAll("<br>", "\n");
+    
+    if(document.getElementById("addDoubleNewlinesCheckBox").checked) {
+        tempInput.value = tempInput.value.replaceAll("\n", "\n\n");
+    }
+
     tempInput.select();
     tempInput.setSelectionRange(0,999999);
     
@@ -44,7 +50,13 @@ async function copyOutput() {
 
 function downloadOutput() {
     let element = document.createElement('a');
-    element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(document.getElementById("emojiContainer").innerHTML.replaceAll("<br>", "\n")));
+    let textToSave = document.getElementById("emojiContainer").innerHTML.replaceAll("<br>", "\n");
+
+    if(document.getElementById("addDoubleNewlinesCheckBox").checked) {
+        textToSave = textToSave.replaceAll("\n", "\n\n");
+    }
+
+    element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(textToSave));
     element.setAttribute("download", `emojificationator-${Date.now()}.txt`);
     element.style.display = "none";
     document.body.appendChild(element);
@@ -314,5 +326,6 @@ function resetImage() {
     document.getElementById("size1").checked = true;
     document.getElementById("transparencyKey").selectedIndex = 6;
     document.getElementById("hqDownsampleCheckBox").checked = true;
+    document.getElementById("addDoubleNewlinesCheckBox").checked = false;
     location.reload();
 }
