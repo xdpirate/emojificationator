@@ -11,17 +11,29 @@ let croppedContext = croppedCanvas.getContext("2d");
 let imageUploaded = false;
 
 let emojiCount = [0,0,0,0,0,0,0,0];
-let gaymojiCount = [0,0,0,0,0,0,0,0];
+let gaymojiCount = emojiCount.slice(0);
+
 let defaultEmojis = ["🟥", "🟧", "🟨", "🟩", "🟦", "🟪", "⬜", "⬛"];
 let defaultGaymojis = ["💖", "🧡", "💛", "🥒", "💙", "🍆", "🤍", "🖤"]; // (❁´◡`❁)
-let currentEmojis = ["🟥", "🟧", "🟨", "🟩", "🟦", "🟪", "⬜", "⬛"];
-let currentGaymojis = ["💖", "🧡", "💛", "🥒", "💙", "🍆", "🤍", "🖤"];
+let currentEmojis = defaultEmojis.slice(0);
+let currentGaymojis = defaultGaymojis.slice(0);
 
 // I've removed brown because an inordinate amount of colors will map to it and a lot
 // of images end up being 90% brown. I'm not smart enough to fix this, but if your 
 // character class is Color Mathematician, I'd love to hear from you on how this can 
 // be worked around to get a more natural mapping.
 //     [142, 86, 46],   //🟫
+
+let referenceColors = [
+    [255, 0, 0],     //🟥
+    [247, 99, 12],   //🟧
+    [255, 241, 0],   //🟨
+    [0, 255, 0],     //🟩
+    [0, 0, 255],     //🟦
+    [170, 0, 255],   //🟪
+    [255, 255, 255], //⬜
+    [0, 0, 0]        //⬛
+];
 
 async function copyOutput() {
     let tempInput = document.createElement("textarea");
@@ -64,17 +76,6 @@ function downloadOutput() {
     element.click();
     document.body.removeChild(element);
 }
-
-let referenceColors = [
-    [255, 0, 0],     //🟥
-    [247, 99, 12],   //🟧
-    [255, 241, 0],   //🟨
-    [0, 255, 0],     //🟩
-    [0, 0, 255],     //🟦
-    [170, 0, 255],   //🟪
-    [255, 255, 255], //⬜
-    [0, 0, 0]        //⬛
-];
 
 function writeInitialImage(referer){
     let reader = new FileReader();
@@ -120,7 +121,7 @@ function emojificate() {
     if(imageUploaded) {
         // Reset counters
         emojiCount = [0,0,0,0,0,0,0,0];
-        gaymojiCount = [0,0,0,0,0,0,0,0];
+        gaymojiCount = emojiCount.slice(0);
 
         // Crush img
         let size = Number(document.querySelector('input[name="outputSize"]:checked').value);
@@ -190,13 +191,13 @@ function finalizeDrawing() {
             let threshold = Number(document.getElementById("monochromeThresholdSlider").value);
             let monochromeInvert = document.getElementById("monochromeInvertCheckBox").checked;
             
+            let val = monochromeInvert ? 0 : 255;
+            
             if(r < threshold || g < threshold || b < threshold) {
-                let val = monochromeInvert ? 255 : 0;
-                r = val; g = val; b = val;
-            } else {
-                let val = monochromeInvert ? 0 : 255;
-                r = val; g = val; b = val;
+                val = monochromeInvert ? 255 : 0;
             }
+
+            r = val; g = val; b = val;
             a = 255; // Ignore alpha in 1-bit mode
         }
 
@@ -301,24 +302,26 @@ function updateCustomColors(reset) {
 }
 
 function resetAdjustments() {
-    let sliders = ["brightness", "contrast", "grayscale", "hue", "saturation", "sepia", "invert", "monochromeThreshold"];
-
-    document.getElementById("brightnessSlider").value = 100;
-    document.getElementById("contrastSlider").value = 100;
-    document.getElementById("grayscaleSlider").value = 0;
-    document.getElementById("hueSlider").value = 0;
-    document.getElementById("saturationSlider").value = 100;
-    document.getElementById("sepiaSlider").value = 0;
-    document.getElementById("invertSlider").value = 0;
-    document.getElementById("monochromeThresholdSlider").value = 128;
+    let defaultValues = {
+        "brightness": 100,
+        "contrast": 100,
+        "grayscale": 0,
+        "hue": 0,
+        "saturation": 100,
+        "sepia": 0,
+        "invert": 0,
+        "monochromeThreshold": 128
+    };
+    
+    for(let slider in defaultValues) {
+        document.getElementById(slider + "Slider").value = defaultValues[slider];
+        updateSliderLabel(slider);
+    }
 
     document.getElementById("monochromeCheckBox").checked = false;
     document.getElementById("monochromeInvertCheckBox").checked = false;
     document.getElementById("gayCheckBox").checked = false;
 
-    for(let i = 0; i < sliders.length; i++) {
-        updateSliderLabel(sliders[i]);
-    }
 }
 
 function resetImage() {
