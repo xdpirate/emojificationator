@@ -20,6 +20,12 @@
                 <input type="button" value="Reset image" onclick="resetImage();" class="resetButton">
                 <label for="imageLoader">Load an image: </label><input type="file" id="imageLoader" name="imageLoader"/><br />
                 
+                <div id="canvasAreaContainer" class="hidden">
+                    <div id="canvasContainer">
+                        <canvas id="croppedCanvas" title="Reference image"></canvas>
+                    </div>
+                </div>
+                
                 Max output size:
                 <input type="radio" id="size1" name="outputSize" value="64" onchange="setInitialCropValues();emojificate()" checked><label for="size1">64x64</label>
                 <input type="radio" id="size2" name="outputSize" value="32" onchange="setInitialCropValues();emojificate()"><label for="size2">32x32</label>
@@ -39,16 +45,7 @@
 
                 <input type="checkbox" id="hqDownsampleCheckBox" name="hqDownsampleCheckBox" onchange="emojificate();" checked><label for="hqDownsampleCheckBox" title="Ignored for images that are smaller than or equal to the max output size">High quality downsampling</label><br />
                 
-                <input type="checkbox" id="addDoubleNewlinesCheckBox" name="addDoubleNewlinesCheckBox"><label for="addDoubleNewlinesCheckBox" title="For Markdown documents, Reddit, etc.">Add double newlines when copying/saving</label><br />
-                
-                <br />
-            </div>
-
-            <div id="canvasAreaContainer" class="hidden">
-                Reference image:<br />
-                <div id="canvasContainer">
-                    <canvas id="croppedCanvas"></canvas>
-                </div>
+                <input type="checkbox" id="addDoubleNewlinesCheckBox" name="addDoubleNewlinesCheckBox"><label for="addDoubleNewlinesCheckBox" title="For Markdown documents, Reddit, etc.">Add double newlines when copying/saving</label>
             </div>
 
             <div class="areaContainer">

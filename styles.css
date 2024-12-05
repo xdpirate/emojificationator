@@ -55,7 +55,7 @@ td {
 #emojiContainer {
     font-size: xx-small;
     line-height: normal;
-    font-family: Segoe UI Emoji;
+    font-family: Segoe UI Symbol;
 }
 
 .areaContainer {
@@ -96,6 +96,11 @@ td {
     top: 0.8em;
     background-color: #2e3440;
     width: fit-content;
+}
+
+#canvasAreaContainer {
+    float: right;
+    margin-top: 0.3em;
 }
 
 label {
